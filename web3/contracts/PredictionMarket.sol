@@ -95,10 +95,8 @@ contract PredictionMarket is Ownable {
         }
 
         if (
-            (market.yesBalances[msg.sender] == _amount &&
-                market.noBalances[msg.sender] == 0) ||
-            (market.noBalances[msg.sender] == _amount &&
-                market.yesBalances[msg.sender] == 0)
+            market.yesBalances[msg.sender] + market.noBalances[msg.sender] ==
+            _amount
         ) {
             market.participants.push(msg.sender);
         }

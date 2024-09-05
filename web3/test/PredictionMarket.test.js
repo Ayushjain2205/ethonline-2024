@@ -152,10 +152,19 @@ describe("PredictionMarket", function () {
 
       // Check for PayoutDistributed events
       const payoutEvents = receipt.logs
-        .filter((log) => log.event === "PayoutDistributed")
-        .map((log) => ({
-          recipient: log.args.recipient,
-          amount: log.args.amount,
+        .map((log) => {
+          try {
+            return predictionMarket.interface.parseLog(log);
+          } catch (e) {
+            return null;
+          }
+        })
+        .filter(
+          (parsedLog) => parsedLog && parsedLog.name === "PayoutDistributed"
+        )
+        .map((parsedLog) => ({
+          recipient: parsedLog.args.recipient,
+          amount: parsedLog.args.amount,
         }));
 
       console.log("Payout events:", payoutEvents);
@@ -178,6 +187,11 @@ describe("PredictionMarket", function () {
 
       expect(BigInt(finalBalance1)).to.be.gt(BigInt(initialBalance1));
       expect(finalBalance2).to.equal(initialBalance2);
+
+      // Add assertions for the payout events
+      expect(payoutEvents.length).to.equal(1);
+      expect(payoutEvents[0].recipient).to.equal(addr1.address);
+      expect(payoutEvents[0].amount).to.equal(expectedPayout);
 
       const marketDetails = await predictionMarket.getMarketDetails(marketId);
       expect(marketDetails.resolved).to.be.true;
