@@ -39,8 +39,9 @@ contract PredictionMarket is Ownable {
         address recipient,
         uint256 amount
     );
+    event DebugLog(string message, uint256 value);
 
-    error InvalidEndTime();
+    error InvalidMarketId();
     error MarketAlreadyResolved();
     error MarketNotEnded();
     error MarketEnded();
@@ -51,9 +52,7 @@ contract PredictionMarket is Ownable {
     }
 
     function createMarket(string memory _question, uint256 _endTime) external {
-        if (_endTime <= block.timestamp) {
-            revert InvalidEndTime();
-        }
+        require(_endTime > block.timestamp, "End time must be in the future");
 
         marketCount++;
         Market storage newMarket = markets[marketCount];
@@ -69,22 +68,33 @@ contract PredictionMarket is Ownable {
         bool _isYes,
         uint256 _amount
     ) external {
+        emit DebugLog("Buy shares called", _marketId);
         Market storage market = markets[_marketId];
-        if (market.resolved) {
-            revert MarketAlreadyResolved();
-        }
-        if (block.timestamp >= market.endTime) {
-            revert MarketEnded();
-        }
+        if (market.creator == address(0)) revert InvalidMarketId();
+        emit DebugLog("Market found", _marketId);
+        if (market.resolved) revert MarketAlreadyResolved();
+        if (block.timestamp >= market.endTime) revert MarketEnded();
 
-        if (token.allowance(msg.sender, address(this)) < _amount) {
-            revert InsufficientAllowance();
-        }
+        emit DebugLog("Checking balance", _amount);
+        require(
+            token.balanceOf(msg.sender) >= _amount,
+            "Insufficient token balance"
+        );
+        emit DebugLog("Balance ok", _amount);
 
+        emit DebugLog("Checking allowance", _amount);
+        require(
+            token.allowance(msg.sender, address(this)) >= _amount,
+            "Insufficient allowance"
+        );
+        emit DebugLog("Allowance ok", _amount);
+
+        emit DebugLog("Transferring tokens", _amount);
         require(
             token.transferFrom(msg.sender, address(this), _amount),
             "Token transfer failed"
         );
+        emit DebugLog("Transfer successful", _amount);
 
         if (_isYes) {
             market.yesShares += _amount;
@@ -94,10 +104,11 @@ contract PredictionMarket is Ownable {
             market.noBalances[msg.sender] += _amount;
         }
 
-        if (
-            market.yesBalances[msg.sender] + market.noBalances[msg.sender] ==
-            _amount
-        ) {
+        bool isNewParticipant = (market.yesBalances[msg.sender] == _amount &&
+            market.noBalances[msg.sender] == 0) ||
+            (market.noBalances[msg.sender] == _amount &&
+                market.yesBalances[msg.sender] == 0);
+        if (isNewParticipant) {
             market.participants.push(msg.sender);
         }
 
