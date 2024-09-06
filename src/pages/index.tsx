@@ -11,10 +11,8 @@ import {
 } from "@/helpers/contractHelpers";
 
 import CreateMarket from "@/components/functional/CreateMarket";
-import BuyShares from "@/components/functional/BuyShares";
 import MarketsList from "@/components/functional/MarketsList";
 
-// Add this at the top of your file
 declare global {
   interface Window {
     ethereum?: any;
@@ -144,7 +142,8 @@ export default function PredictionMarketPage() {
             fetchMarkets={fetchMarkets}
           />
 
-          <BuyShares
+          <MarketsList
+            markets={markets}
             contract={contract}
             tokenContract={tokenContract}
             walletAddress={walletAddress}
@@ -152,8 +151,6 @@ export default function PredictionMarketPage() {
             setSuccess={setSuccess}
             fetchMarkets={fetchMarkets}
           />
-
-          <MarketsList markets={markets} />
         </>
       )}
     </div>

@@ -1,10 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import MarketItem from "./MarketItem";
+import { ethers } from "ethers";
 
 interface Market {
   id: number;
@@ -18,29 +13,39 @@ interface Market {
 
 interface MarketsListProps {
   markets: Market[];
+  contract: ethers.Contract | null;
+  tokenContract: ethers.Contract | null;
+  walletAddress: string;
+  setError: (error: string) => void;
+  setSuccess: (success: string) => void;
+  fetchMarkets: () => void;
 }
 
-const MarketsList: React.FC<MarketsListProps> = ({ markets }) => {
+const MarketsList: React.FC<MarketsListProps> = ({
+  markets,
+  contract,
+  tokenContract,
+  walletAddress,
+  setError,
+  setSuccess,
+  fetchMarkets,
+}) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Markets</CardTitle>
-        <CardDescription>List of all prediction markets</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {markets.map((market) => (
-          <div key={market.id} className="mb-4 p-4 border rounded">
-            <h3 className="font-bold">Market ID: {market.id}</h3>
-            <p>Question: {market.question}</p>
-            <p>Creator: {market.creator}</p>
-            <p>End Time: {market.endTime}</p>
-            <p>Resolved: {market.resolved ? "Yes" : "No"}</p>
-            <p>Yes Shares: {market.yesShares}</p>
-            <p>No Shares: {market.noShares}</p>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <div>
+      <h2 className="text-xl font-bold mb-4">Markets</h2>
+      {markets.map((market) => (
+        <MarketItem
+          key={market.id}
+          market={market}
+          contract={contract}
+          tokenContract={tokenContract}
+          walletAddress={walletAddress}
+          setError={setError}
+          setSuccess={setSuccess}
+          fetchMarkets={fetchMarkets}
+        />
+      ))}
+    </div>
   );
 };
 
