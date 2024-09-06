@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
 import { ethers } from "ethers";
 import {
@@ -36,7 +38,7 @@ export default function Component({
 
   const calculatePayout = useMemo(() => {
     const betAmount = amount;
-    if (isNaN(betAmount) || betAmount <= 0) return { yes: "0.00", no: "0.00" };
+    if (isNaN(betAmount) || betAmount <= 0) return { yes: "0", no: "0" };
 
     const yesShares = parseFloat(market.yesShares);
     const noShares = parseFloat(market.noShares);
@@ -133,33 +135,42 @@ export default function Component({
           <span className="text-2xl">🎭</span> {market.question}
         </CardTitle>
         <CardDescription className="text-yellow-100 flex items-center gap-2 text-sm">
-          <Clock className="w-4 h-4" /> Ends:{" "}
+          <Clock className="w-4 h-4" /> {market.resolved ? "Ended" : "Ends:"}{" "}
           {new Date(market.endTime).toLocaleString()}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4">
         <div className="flex justify-between mb-4 bg-white rounded-xl p-3 shadow-inner">
-          <div className="text-center">
-            <div className="text-xl font-bold text-green-500">
-              {market.yesShares}
+          <div className="text-center relative w-[52px] h-[52px]">
+            <div className="absolute inset-0 bg-green-200 rounded-full opacity-30"></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="text-xl font-bold text-green-700">
+                {parseFloat(market.yesShares)}
+              </div>
+              <div className="text-sm text-green-600">Yes</div>
             </div>
-            <div className="text-sm text-green-700">Yes</div>
           </div>
-          <div className="text-center">
-            <div className="text-xl font-bold text-red-500">
-              {market.noShares}
+          <div className="text-center relative w-[52px] h-[52px]">
+            <div className="absolute inset-0 bg-red-200 rounded-full opacity-30"></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="text-xl font-bold text-red-700">
+                {parseFloat(market.noShares)}
+              </div>
+              <div className="text-sm text-red-600">No</div>
             </div>
-            <div className="text-sm text-red-700">No</div>
           </div>
-          <div className="text-center">
-            <div
-              className={`text-lg font-bold ${
-                market.resolved ? "text-purple-600" : "text-blue-600"
-              }`}
-            >
-              {market.resolved ? "Over" : "Active"}
-            </div>
-            <div className="text-sm text-gray-700">Status</div>
+          <div className="text-center relative w-[52px] h-[52px] flex items-center justify-center">
+            {market.resolved ? (
+              <div className="text-sm font-bold text-purple-600 flex flex-col items-center">
+                <span className="text-lg">🏁</span>
+                <span>Ended</span>
+              </div>
+            ) : (
+              <div className="text-sm font-bold text-blue-600 flex flex-col items-center">
+                <span className="text-lg animate-pulse">🔵</span>
+                <span>Ongoing</span>
+              </div>
+            )}
           </div>
         </div>
 
