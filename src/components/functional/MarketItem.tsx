@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { ethers } from "ethers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,20 +28,43 @@ const MarketItem: React.FC<MarketItemProps> = ({
   const [amount, setAmount] = useState("10");
   const [isYes, setIsYes] = useState(true);
 
+  const calculatePayout = useMemo(() => {
+    const betAmount = parseFloat(amount);
+    if (isNaN(betAmount) || betAmount <= 0) return { yes: "0.00", no: "0.00" };
+
+    const yesShares = parseFloat(market.yesShares);
+    const noShares = parseFloat(market.noShares);
+    const totalShares = yesShares + noShares;
+
+    const calculateForOutcome = (outcomeShares: number) => {
+      if (totalShares === 0) return betAmount * 2; // 1:1 odds if no shares
+      const totalAfterBet = totalShares + betAmount;
+      return (totalAfterBet * betAmount) / (outcomeShares + betAmount);
+    };
+
+    const yesPayout = calculateForOutcome(yesShares);
+    const noPayout = calculateForOutcome(noShares);
+
+    return {
+      yes: yesPayout.toFixed(2),
+      no: noPayout.toFixed(2),
+    };
+  }, [amount, market.yesShares, market.noShares]);
+
   const buyShares = async () => {
     if (!contract || !tokenContract) return;
     setError("");
     setSuccess("");
     try {
-      const amountWei = ethers.parseUnits(amount, 6);
+      const amountWei = ethers.parseUnits(amount, 6); // Assuming 6 decimals for USDC
 
       const balance = await tokenContract.balanceOf(walletAddress);
       if (balance < amountWei) {
         setError(
-          `Insufficient USDC balance. You need ${ethers.formatUnits(
+          `Insufficient balance. You need ${ethers.formatUnits(
             amountWei,
             6
-          )} USDC but only have ${ethers.formatUnits(balance, 6)} USDC.`
+          )} USDC.`
         );
         return;
       }
@@ -66,16 +89,6 @@ const MarketItem: React.FC<MarketItemProps> = ({
       console.error("Error buying shares:", error);
       setError("Error buying shares: " + (error as Error).message);
     }
-  };
-
-  const calculateWinnings = () => {
-    // This is a simplified calculation and should be adjusted based on your actual market mechanics
-    const totalShares =
-      parseFloat(market.yesShares) + parseFloat(market.noShares);
-    const odds =
-      totalShares /
-      (isYes ? parseFloat(market.yesShares) : parseFloat(market.noShares));
-    return (parseFloat(amount) * odds).toFixed(2);
   };
 
   return (
@@ -121,7 +134,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
             className="w-full mb-2"
             variant={isYes ? "default" : "outline"}
           >
-            Bet Yes (To win ${calculateWinnings()})
+            Bet Yes (Potential payout: ${calculatePayout.yes})
           </Button>
           <Button
             onClick={() => {
@@ -131,7 +144,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
             className="w-full"
             variant={!isYes ? "default" : "outline"}
           >
-            Bet No (To win ${calculateWinnings()})
+            Bet No (Potential payout: ${calculatePayout.no})
           </Button>
         </div>
       </CardContent>
