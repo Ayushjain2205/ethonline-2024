@@ -8,11 +8,10 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Wallet, Coins } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { MOCK_TOKEN_ADDRESS, MOCK_TOKEN_ABI } from "@/helpers/contractHelpers";
 
@@ -23,15 +22,12 @@ export default function USDCFaucet() {
     null
   );
   const [walletAddress, setWalletAddress] = useState("");
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [amount, setAmount] = useState("500");
   const [isConnecting, setIsConnecting] = useState(false);
   const [balance, setBalance] = useState("0");
 
   const connectWallet = async () => {
     setIsConnecting(true);
-    setError("");
     try {
       if (typeof window.ethereum !== "undefined") {
         await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -49,12 +45,13 @@ export default function USDCFaucet() {
         const address = await signer.getAddress();
         setWalletAddress(address);
         updateBalance(tokenContract, address);
+        toast.success("Wallet connected successfully!");
       } else {
-        setError("Ethereum wallet not detected. Please install MetaMask.");
+        toast.error("Ethereum wallet not detected. Please install MetaMask.");
       }
     } catch (error) {
       console.error("Failed to connect:", error);
-      setError("Failed to connect to wallet: " + (error as Error).message);
+      toast.error("Failed to connect to wallet: " + (error as Error).message);
     } finally {
       setIsConnecting(false);
     }
@@ -73,37 +70,31 @@ export default function USDCFaucet() {
 
   const mintUSDC = async () => {
     if (!tokenContract) return;
-    setError("");
-    setSuccess("");
     try {
       const mintAmount = Math.min(Number(amount), 1000); // Limit to 1000 USDC
       const amountWei = ethers.parseUnits(mintAmount.toString(), 6);
       const tx = await tokenContract.mint(walletAddress, amountWei);
       await tx.wait();
-      setSuccess(`Successfully minted ${mintAmount} USDC to ${walletAddress}`);
+      toast.success(
+        `Successfully minted ${mintAmount} USDC to ${truncateAddress(
+          walletAddress
+        )}`
+      );
       setAmount("");
       updateBalance(tokenContract, walletAddress);
     } catch (error) {
       console.error("Error minting USDC:", error);
-      setError("Error minting USDC: " + (error as Error).message);
+      toast.error("Error minting USDC: " + (error as Error).message);
     }
+  };
+
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   return (
     <div className="w-full max-w-sm container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6 text-center">USDC Faucet</h1>
-
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <Alert variant="success" className="mb-4">
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
 
       <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-lg rounded-2xl border-2 border-purple-600">
         <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
@@ -130,7 +121,7 @@ export default function USDCFaucet() {
                 <p className="text-sm font-bold text-purple-700 mb-1">
                   Connected wallet:
                 </p>
-                <p className="text-sm break-all">{walletAddress}</p>
+                <p className="text-sm">{truncateAddress(walletAddress)}</p>
               </div>
               <div className="bg-white rounded-xl p-3 shadow-inner">
                 <p className="text-sm font-bold text-purple-700 mb-1">
