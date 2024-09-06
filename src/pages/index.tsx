@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Market } from "@/types";
 
 import {
   PREDICTION_MARKET_ADDRESS,
@@ -17,16 +18,6 @@ declare global {
   interface Window {
     ethereum?: any;
   }
-}
-
-interface Market {
-  id: number;
-  creator: string;
-  question: string;
-  endTime: number;
-  resolved: boolean;
-  yesShares: string;
-  noShares: string;
 }
 
 export default function PredictionMarketPage() {
@@ -104,7 +95,11 @@ export default function PredictionMarketPage() {
           noShares: ethers.formatUnits(market.noShares, 6),
         });
       }
-      setMarkets(fetchedMarkets);
+      // Sort markets in descending order of time
+      const sortedMarkets = fetchedMarkets.sort(
+        (a, b) => b.endTime - a.endTime
+      );
+      setMarkets(sortedMarkets);
     } catch (error) {
       console.error("Error fetching markets:", error);
       setError("Failed to fetch markets: " + (error as Error).message);
