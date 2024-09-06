@@ -24,18 +24,20 @@ const MarketsList: React.FC<MarketsListProps> = ({
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Markets</h2>
-      {markets.map((market) => (
-        <MarketItem
-          key={market.id}
-          market={market}
-          contract={contract}
-          tokenContract={tokenContract}
-          walletAddress={walletAddress}
-          setError={setError}
-          setSuccess={setSuccess}
-          fetchMarkets={fetchMarkets}
-        />
-      ))}
+      <div className="flex flex-col gap-4">
+        {markets.map((market) => (
+          <MarketItem
+            key={market.id}
+            market={market}
+            contract={contract}
+            tokenContract={tokenContract}
+            walletAddress={walletAddress}
+            setError={setError}
+            setSuccess={setSuccess}
+            fetchMarkets={fetchMarkets}
+          />
+        ))}
+      </div>
     </div>
   );
 };
