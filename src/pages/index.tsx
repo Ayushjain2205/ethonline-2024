@@ -112,8 +112,8 @@ export default function PredictionMarketPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Prediction Market</h1>
+    <div className="container mx-auto px-4 py-6 max-w-md">
+      <h1 className="text-2xl font-bold mb-6 text-center">Prediction Market</h1>
 
       {error && (
         <Alert variant="destructive" className="mb-4">
@@ -128,12 +128,18 @@ export default function PredictionMarketPage() {
       )}
 
       {!walletAddress ? (
-        <Button onClick={connectWallet} disabled={isConnecting}>
+        <Button
+          onClick={connectWallet}
+          disabled={isConnecting}
+          className="w-full"
+        >
           {isConnecting ? "Connecting..." : "Connect Wallet"}
         </Button>
       ) : (
         <>
-          <p className="mb-4">Connected wallet: {walletAddress}</p>
+          <p className="mb-4 text-sm text-center break-words">
+            Connected wallet: {walletAddress}
+          </p>
 
           <CreateMarket
             contract={contract}

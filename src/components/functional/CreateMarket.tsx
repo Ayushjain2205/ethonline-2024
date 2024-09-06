@@ -19,12 +19,12 @@ interface CreateMarketProps {
   fetchMarkets: () => void;
 }
 
-const CreateMarket: React.FC<CreateMarketProps> = ({
+export default function CreateMarket({
   contract,
   setError,
   setSuccess,
   fetchMarkets,
-}) => {
+}: CreateMarketProps) {
   const [question, setQuestion] = useState("");
   const [endTime, setEndTime] = useState("");
 
@@ -47,20 +47,20 @@ const CreateMarket: React.FC<CreateMarketProps> = ({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-xl rounded-3xl border-4 border-purple-600 mb-8">
-      <CardHeader className="bg-purple-600 text-yellow-300 p-6 rounded-t-2xl">
-        <CardTitle className="text-3xl font-extrabold flex items-center gap-2">
-          <span className="text-4xl">🎭</span> Create New Market
+    <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-lg rounded-2xl border-2 border-purple-600 mb-4">
+      <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
+        <CardTitle className="text-xl font-extrabold flex items-center gap-2">
+          <span className="text-2xl">🎭</span> Create New Market
         </CardTitle>
-        <CardDescription className="text-yellow-100 text-lg">
+        <CardDescription className="text-yellow-100 text-sm">
           Set up a new prediction for others to bet on!
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
-        <div className="bg-white rounded-xl p-4 shadow-inner">
+      <CardContent className="p-4 space-y-4">
+        <div className="bg-white rounded-xl p-3 shadow-inner">
           <Label
             htmlFor="question"
-            className="block text-xl font-bold text-purple-700 mb-2"
+            className="block text-lg font-bold text-purple-700 mb-2"
           >
             What's your prediction?
           </Label>
@@ -69,37 +69,35 @@ const CreateMarket: React.FC<CreateMarketProps> = ({
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Will ETH reach $5000 by the end of 2024?"
-            className="w-full p-3 border-2 border-purple-400 rounded-lg text-lg"
+            className="w-full p-2 border-2 border-purple-400 rounded-xl text-base"
           />
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-inner">
+        <div className="bg-white rounded-xl p-3 shadow-inner">
           <Label
             htmlFor="endTime"
-            className="block text-xl font-bold text-purple-700 mb-2"
+            className="block text-lg font-bold text-purple-700 mb-2"
           >
             When does the prediction end?
           </Label>
           <div className="relative">
-            <Clock className="absolute top-1/2 left-3 transform -translate-y-1/2 text-purple-600 w-6 h-6" />
+            <Clock className="absolute top-1/2 left-2 transform -translate-y-1/2 text-purple-600 w-5 h-5" />
             <Input
               id="endTime"
               type="datetime-local"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full p-3 pl-12 border-2 border-purple-400 rounded-lg text-lg"
+              className="w-full p-2 pl-9 border-2 border-purple-400 rounded-xl text-base"
             />
           </div>
         </div>
         <Button
           onClick={createMarket}
-          className="w-full h-16 text-xl font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-lg flex items-center justify-center"
+          className="w-full h-12 text-base font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md flex items-center justify-center"
         >
-          <PlusCircle className="w-8 h-8 mr-2" />
+          <PlusCircle className="w-5 h-5 mr-2" />
           Create Market
         </Button>
       </CardContent>
     </Card>
   );
-};
-
-export default CreateMarket;
+}

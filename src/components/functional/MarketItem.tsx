@@ -98,49 +98,49 @@ export default function Component({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-xl rounded-3xl border-4 border-purple-600">
-      <CardHeader className="bg-purple-600 text-yellow-300 p-6 rounded-t-2xl">
-        <CardTitle className="text-3xl font-extrabold flex items-center gap-2">
-          <span className="text-4xl">🎭</span> {market.question}
+    <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-xl rounded-2xl border-2 border-purple-600">
+      <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
+        <CardTitle className="text-xl font-extrabold flex items-center gap-2">
+          <span className="text-2xl">🎭</span> {market.question}
         </CardTitle>
-        <CardDescription className="text-yellow-100 flex items-center gap-2 text-lg">
-          <Clock className="w-6 h-6" /> Ends:{" "}
+        <CardDescription className="text-yellow-100 flex items-center gap-2 text-sm">
+          <Clock className="w-4 h-4" /> Ends:{" "}
           {new Date(market.endTime).toLocaleString()}
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="flex justify-between mb-6 bg-white rounded-xl p-4 shadow-inner">
+      <CardContent className="p-4">
+        <div className="flex justify-between mb-4 bg-white rounded-xl p-3 shadow-inner">
           <div className="text-center">
-            <div className="text-3xl font-bold text-green-500">
+            <div className="text-xl font-bold text-green-500">
               {market.yesShares}
             </div>
-            <div className="text-lg text-green-700">Yes Votes</div>
+            <div className="text-sm text-green-700">Yes</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-red-500">
+            <div className="text-xl font-bold text-red-500">
               {market.noShares}
             </div>
-            <div className="text-lg text-red-700">No Votes</div>
+            <div className="text-sm text-red-700">No</div>
           </div>
           <div className="text-center">
             <div
-              className={`text-2xl font-bold ${
+              className={`text-lg font-bold ${
                 market.resolved ? "text-purple-600" : "text-blue-600"
               }`}
             >
-              {market.resolved ? "Game Over!" : "Still Playing!"}
+              {market.resolved ? "Over" : "Active"}
             </div>
-            <div className="text-lg text-gray-700">Status</div>
+            <div className="text-sm text-gray-700">Status</div>
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-4 shadow-inner">
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl p-3 shadow-inner">
             <label
               htmlFor="amount"
-              className="block text-xl font-bold text-purple-700 mb-2"
+              className="block text-lg font-bold text-purple-700 mb-2"
             >
-              How many coins to bet?
+              Bet amount:
             </label>
             <div className="relative pt-1">
               <input
@@ -149,33 +149,33 @@ export default function Component({
                 max="1000"
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value))}
-                className="w-full h-4 bg-purple-200 rounded-full appearance-none cursor-pointer"
+                className="w-full h-2 bg-purple-200 rounded-full appearance-none cursor-pointer"
               />
               <div
-                className="absolute left-0 -top-2 flex items-center justify-center w-12 h-12 transform -translate-x-1/2 bg-yellow-400 rounded-full text-purple-900 font-bold text-xl border-4 border-purple-600 shadow-lg transition-all duration-200 ease-out"
+                className="absolute left-0 -top-1 flex items-center justify-center w-8 h-8 transform -translate-x-1/2 bg-yellow-400 rounded-full text-purple-900 font-bold text-sm border-2 border-purple-600 shadow-md transition-all duration-200 ease-out"
                 style={{ left: `${(amount / 1000) * 100}%` }}
               >
                 ${amount}
               </div>
             </div>
-            <div className="flex justify-between text-lg text-purple-600 mt-2 font-bold">
+            <div className="flex justify-between text-sm text-purple-600 mt-1 font-bold">
               <span>$1</span>
               <span>$1000</span>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={() => {
                 setIsYes(true);
                 buyShares();
               }}
-              className={`w-full h-16 text-xl font-bold rounded-full ${
+              className={`w-full h-12 text-sm font-bold rounded-full ${
                 isYes
                   ? "bg-green-500 hover:bg-green-600 text-white"
                   : "bg-gray-300 text-gray-600 hover:bg-gray-400"
-              } transition-colors duration-200 shadow-lg`}
+              } transition-colors duration-200 shadow-md`}
             >
-              <ThumbsUp className="w-8 h-8 mr-2" />
+              <ThumbsUp className="w-4 h-4 mr-1" />
               Yes (${calculatePayout.yes})
             </Button>
             <Button
@@ -183,13 +183,13 @@ export default function Component({
                 setIsYes(false);
                 buyShares();
               }}
-              className={`w-full h-16 text-xl font-bold rounded-full ${
+              className={`w-full h-12 text-sm font-bold rounded-full ${
                 !isYes
                   ? "bg-red-500 hover:bg-red-600 text-white"
                   : "bg-gray-300 text-gray-600 hover:bg-gray-400"
-              } transition-colors duration-200 shadow-lg`}
+              } transition-colors duration-200 shadow-md`}
             >
-              <ThumbsDown className="w-8 h-8 mr-2" />
+              <ThumbsDown className="w-4 h-4 mr-1" />
               No (${calculatePayout.no})
             </Button>
           </div>
