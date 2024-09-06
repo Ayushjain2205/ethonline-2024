@@ -112,14 +112,14 @@ export default function PredictionMarketPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-md">
+    <div className="w-full max-w-sm text-wrap container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Prediction Market</h1>
 
-      {error && (
+      {/* {error && (
         <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      )}
+      )} */}
 
       {success && (
         <Alert variant="success" className="mb-4">

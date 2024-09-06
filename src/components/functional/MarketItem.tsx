@@ -57,13 +57,13 @@ export default function Component({
     };
   }, [amount, market.yesShares, market.noShares]);
 
-  const buyShares = async () => {
+  const buyShares = async (selectedIsYes: boolean) => {
     if (!contract || !tokenContract) return;
     setError("");
     setSuccess("");
     try {
       console.log("Buying shares for market:", market.id);
-      console.log("Is Yes:", isYes);
+      console.log("Is Yes:", selectedIsYes);
       console.log("Amount:", amount);
 
       const amountWei = ethers.parseUnits(amount.toString(), 6);
@@ -99,9 +99,14 @@ export default function Component({
       }
 
       console.log("Buying shares...");
-      const buyTx = await contract.buyShares(market.id, isYes, amountWei, {
-        gasLimit: 300000, // Adjust this value as needed
-      });
+      const buyTx = await contract.buyShares(
+        market.id,
+        selectedIsYes,
+        amountWei,
+        {
+          gasLimit: 300000, // Adjust this value as needed
+        }
+      );
       console.log("Buy transaction submitted");
       await buyTx.wait();
       console.log("Buy transaction completed");
@@ -189,29 +194,15 @@ export default function Component({
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Button
-              onClick={() => {
-                setIsYes(true);
-                buyShares();
-              }}
-              className={`w-full h-12 text-sm font-bold rounded-full ${
-                isYes
-                  ? "bg-green-500 hover:bg-green-600 text-white"
-                  : "bg-gray-300 text-gray-600 hover:bg-gray-400"
-              } transition-colors duration-200 shadow-md`}
+              onClick={() => buyShares(true)}
+              className="w-full h-12 text-sm font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md"
             >
               <ThumbsUp className="w-4 h-4 mr-1" />
               Yes (${calculatePayout.yes})
             </Button>
             <Button
-              onClick={() => {
-                setIsYes(false);
-                buyShares();
-              }}
-              className={`w-full h-12 text-sm font-bold rounded-full ${
-                !isYes
-                  ? "bg-red-500 hover:bg-red-600 text-white"
-                  : "bg-gray-300 text-gray-600 hover:bg-gray-400"
-              } transition-colors duration-200 shadow-md`}
+              onClick={() => buyShares(false)}
+              className="w-full h-12 text-sm font-bold rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors duration-200 shadow-md"
             >
               <ThumbsDown className="w-4 h-4 mr-1" />
               No (${calculatePayout.no})
