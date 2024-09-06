@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useMemo } from "react";
 import { ethers } from "ethers";
 import {
@@ -13,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PREDICTION_MARKET_ADDRESS } from "@/helpers/contractHelpers";
 import { Market } from "@/types";
 import { Clock, ThumbsUp, ThumbsDown } from "lucide-react";
+import dayjs from "../../dayjs-config";
 
 interface MarketItemProps {
   market: Market;
@@ -128,6 +127,30 @@ export default function Component({
     }
   };
 
+  const formatTimeRemaining = (endTime: string) => {
+    const now = dayjs();
+    const end = dayjs(endTime);
+    const diff = end.diff(now);
+
+    if (diff > 0) {
+      // Market hasn't ended yet
+      const duration = dayjs.duration(diff);
+      const days = duration.days();
+      const hours = duration.hours();
+      const minutes = duration.minutes();
+
+      let timeString = "";
+      if (days > 0) timeString += `${days}d `;
+      if (hours > 0 || days > 0) timeString += `${hours}h `;
+      timeString += `${minutes}m`;
+
+      return `Ends in ${timeString}`;
+    } else {
+      // Market has already ended
+      return `Ended ${dayjs(endTime).fromNow()}`;
+    }
+  };
+
   return (
     <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-xl rounded-2xl border-2 border-purple-600">
       <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
@@ -135,8 +158,7 @@ export default function Component({
           <span className="text-2xl">🎭</span> {market.question}
         </CardTitle>
         <CardDescription className="text-yellow-100 flex items-center gap-2 text-sm">
-          <Clock className="w-4 h-4" /> {market.resolved ? "Ended" : "Ends:"}{" "}
-          {new Date(market.endTime).toLocaleString()}
+          <Clock className="w-4 h-4" /> {formatTimeRemaining(market.endTime)}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4">
