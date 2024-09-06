@@ -33,7 +33,11 @@ contract PredictionMarket is Ownable {
         bool isYes,
         uint256 amount
     );
-    event MarketResolved(uint256 indexed marketId, bool outcome);
+    event MarketResolved(
+        uint256 indexed marketId,
+        bool outcome,
+        address resolver
+    );
     event PayoutDistributed(
         uint256 indexed marketId,
         address recipient,
@@ -115,17 +119,12 @@ contract PredictionMarket is Ownable {
         emit SharesPurchased(_marketId, msg.sender, _isYes, _amount);
     }
 
-    function resolveMarket(
-        uint256 _marketId,
-        bool _outcome
-    ) external onlyOwner {
+    function resolveMarket(uint256 _marketId, bool _outcome) external {
         Market storage market = markets[_marketId];
-        if (market.resolved) {
-            revert MarketAlreadyResolved();
-        }
-        if (block.timestamp < market.endTime) {
-            revert MarketNotEnded();
-        }
+
+        if (market.creator == address(0)) revert InvalidMarketId();
+        if (market.resolved) revert MarketAlreadyResolved();
+        require(block.timestamp >= market.endTime, "Market has not ended yet");
 
         market.resolved = true;
 
@@ -149,7 +148,7 @@ contract PredictionMarket is Ownable {
             }
         }
 
-        emit MarketResolved(_marketId, _outcome);
+        emit MarketResolved(_marketId, _outcome, msg.sender);
     }
 
     function getMarketDetails(

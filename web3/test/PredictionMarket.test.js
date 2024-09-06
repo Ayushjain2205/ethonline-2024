@@ -17,7 +17,7 @@ describe("PredictionMarket", function () {
     [owner, addr1, addr2] = await ethers.getSigners();
 
     MockToken = await ethers.getContractFactory("MockToken");
-    mockToken = await MockToken.deploy("Mock USDC", "mUSDC", 6);
+    mockToken = await MockToken.deploy("Mock USDC", "mUSDC", 6, owner.address);
     await mockToken.waitForDeployment();
 
     PredictionMarket = await ethers.getContractFactory("PredictionMarket");
@@ -27,9 +27,9 @@ describe("PredictionMarket", function () {
     );
     await predictionMarket.waitForDeployment();
 
-    // Transfer some tokens to addr1 and addr2
-    await mockToken.transfer(addr1.address, ethers.parseUnits("10000", 6));
-    await mockToken.transfer(addr2.address, ethers.parseUnits("10000", 6));
+    // Mint some tokens to addr1 and addr2
+    await mockToken.mint(addr1.address, ethers.parseUnits("10000", 6));
+    await mockToken.mint(addr2.address, ethers.parseUnits("10000", 6));
 
     // Approve PredictionMarket to spend tokens
     await mockToken.approve(
@@ -91,7 +91,7 @@ describe("PredictionMarket", function () {
 
       await expect(
         predictionMarket.createMarket(question, endTime)
-      ).to.be.revertedWithCustomError(predictionMarket, "InvalidEndTime");
+      ).to.be.revertedWith("End time must be in the future");
     });
   });
 
@@ -133,7 +133,7 @@ describe("PredictionMarket", function () {
     it("Should not allow resolving before end time", async function () {
       await expect(
         predictionMarket.resolveMarket(marketId, true)
-      ).to.be.revertedWithCustomError(predictionMarket, "MarketNotEnded");
+      ).to.be.revertedWith("Market has not ended yet");
     });
 
     it("Should resolve market and distribute payouts correctly", async function () {
@@ -147,7 +147,9 @@ describe("PredictionMarket", function () {
       console.log("Initial balance addr1:", initialBalance1.toString());
       console.log("Initial balance addr2:", initialBalance2.toString());
 
-      const tx = await predictionMarket.resolveMarket(marketId, true);
+      const tx = await predictionMarket
+        .connect(addr1)
+        .resolveMarket(marketId, true);
       const receipt = await tx.wait();
 
       // Check for PayoutDistributed events
@@ -195,10 +197,39 @@ describe("PredictionMarket", function () {
 
       const marketDetails = await predictionMarket.getMarketDetails(marketId);
       expect(marketDetails.resolved).to.be.true;
+
+      // Check that the MarketResolved event was emitted with the correct resolver
+      const marketResolvedEvent = receipt.logs
+        .map((log) => {
+          try {
+            return predictionMarket.interface.parseLog(log);
+          } catch (e) {
+            return null;
+          }
+        })
+        .find((parsedLog) => parsedLog && parsedLog.name === "MarketResolved");
+
+      expect(marketResolvedEvent).to.not.be.undefined;
+      expect(marketResolvedEvent.args.marketId).to.equal(marketId);
+      expect(marketResolvedEvent.args.outcome).to.be.true;
+      expect(marketResolvedEvent.args.resolver).to.equal(addr1.address);
+    });
+
+    it("Should allow anyone to resolve the market after end time", async function () {
+      await ethers.provider.send("evm_increaseTime", [86401]); // 24 hours + 1 second
+      await ethers.provider.send("evm_mine");
+
+      await expect(
+        predictionMarket.connect(addr2).resolveMarket(marketId, false)
+      )
+        .to.emit(predictionMarket, "MarketResolved")
+        .withArgs(marketId, false, addr2.address);
+
+      const marketDetails = await predictionMarket.getMarketDetails(marketId);
+      expect(marketDetails.resolved).to.be.true;
     });
 
     it("Should not allow resolving an already resolved market", async function () {
-      // Fast-forward time
       await ethers.provider.send("evm_increaseTime", [86401]); // 24 hours + 1 second
       await ethers.provider.send("evm_mine");
 
