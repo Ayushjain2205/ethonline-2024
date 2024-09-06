@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PREDICTION_MARKET_ADDRESS } from "@/helpers/contractHelpers";
 import { Market } from "@/types";
-import { Clock, DollarSign, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Clock, ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface MarketItemProps {
   market: Market;
@@ -31,7 +31,7 @@ export default function Component({
   setSuccess,
   fetchMarkets,
 }: MarketItemProps) {
-  const [amount, setAmount] = useState(10);
+  const [amount, setAmount] = useState(5);
   const [isYes, setIsYes] = useState(true);
 
   const calculatePayout = useMemo(() => {
@@ -62,9 +62,16 @@ export default function Component({
     setError("");
     setSuccess("");
     try {
+      console.log("Buying shares for market:", market.id);
+      console.log("Is Yes:", isYes);
+      console.log("Amount:", amount);
+
       const amountWei = ethers.parseUnits(amount.toString(), 6);
+      console.log("Amount in Wei:", amountWei.toString());
 
       const balance = await tokenContract.balanceOf(walletAddress);
+      console.log("Wallet balance:", ethers.formatUnits(balance, 6));
+
       if (balance < amountWei) {
         setError(
           `Oops! Not enough coins in your piggy bank! You need ${ethers.formatUnits(
@@ -79,20 +86,37 @@ export default function Component({
         walletAddress,
         PREDICTION_MARKET_ADDRESS
       );
+      console.log("Current allowance:", ethers.formatUnits(allowance, 6));
+
       if (allowance < amountWei) {
+        console.log("Approving tokens...");
         const approveTx = await tokenContract.approve(
           PREDICTION_MARKET_ADDRESS,
           amountWei
         );
         await approveTx.wait();
+        console.log("Approval transaction completed");
       }
 
-      const buyTx = await contract.buyShares(market.id, isYes, amountWei);
+      console.log("Buying shares...");
+      const buyTx = await contract.buyShares(market.id, isYes, amountWei, {
+        gasLimit: 300000, // Adjust this value as needed
+      });
+      console.log("Buy transaction submitted");
       await buyTx.wait();
+      console.log("Buy transaction completed");
+
       setSuccess("Woohoo! You've placed your bet successfully!");
       fetchMarkets();
     } catch (error) {
       console.error("Error buying shares:", error);
+      if (error instanceof Error) {
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        if ("reason" in error) {
+          console.error("Error reason:", (error as any).reason);
+        }
+      }
       setError("Uh-oh! Something went wrong: " + (error as Error).message);
     }
   };
@@ -138,29 +162,29 @@ export default function Component({
           <div className="bg-white rounded-xl p-3 shadow-inner">
             <label
               htmlFor="amount"
-              className="block text-lg font-bold text-purple-700 mb-2"
+              className="block text-lg font-bold text-purple-700 mb-3"
             >
               Bet amount:
             </label>
-            <div className="relative pt-1">
+            <div className="relative">
               <input
                 type="range"
                 min="1"
-                max="1000"
+                max="10"
                 value={amount}
                 onChange={(e) => setAmount(parseInt(e.target.value))}
                 className="w-full h-2 bg-purple-200 rounded-full appearance-none cursor-pointer"
               />
               <div
                 className="absolute left-0 -top-1 flex items-center justify-center w-8 h-8 transform -translate-x-1/2 bg-yellow-400 rounded-full text-purple-900 font-bold text-sm border-2 border-purple-600 shadow-md transition-all duration-200 ease-out"
-                style={{ left: `${(amount / 1000) * 100}%` }}
+                style={{ left: `${((amount - 1) / 9) * 100}%` }}
               >
                 ${amount}
               </div>
             </div>
             <div className="flex justify-between text-sm text-purple-600 mt-1 font-bold">
               <span>$1</span>
-              <span>$1000</span>
+              <span>$10</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
