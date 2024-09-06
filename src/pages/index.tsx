@@ -14,6 +14,23 @@ import CreateMarket from "@/components/functional/CreateMarket";
 import BuyShares from "@/components/functional/BuyShares";
 import MarketsList from "@/components/functional/MarketsList";
 
+// Add this at the top of your file
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
+interface Market {
+  id: number;
+  creator: string;
+  question: string;
+  endTime: string;
+  resolved: boolean;
+  yesShares: string;
+  noShares: string;
+}
+
 export default function PredictionMarketPage() {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
@@ -25,7 +42,7 @@ export default function PredictionMarketPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
-  const [markets, setMarkets] = useState([]);
+  const [markets, setMarkets] = useState<Market[]>([]);
 
   useEffect(() => {
     connectWallet();
