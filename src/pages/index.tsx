@@ -23,7 +23,7 @@ interface Market {
   id: number;
   creator: string;
   question: string;
-  endTime: string;
+  endTime: number;
   resolved: boolean;
   yesShares: string;
   noShares: string;
@@ -98,7 +98,7 @@ export default function PredictionMarketPage() {
           id: i,
           creator: market.creator,
           question: market.question,
-          endTime: new Date(Number(market.endTime) * 1000).toLocaleString(),
+          endTime: Number(market.endTime),
           resolved: market.resolved,
           yesShares: ethers.formatUnits(market.yesShares, 6),
           noShares: ethers.formatUnits(market.noShares, 6),

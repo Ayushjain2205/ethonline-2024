@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { ethers } from "ethers";
 import {
   Card,
@@ -127,9 +127,9 @@ export default function Component({
     }
   };
 
-  const formatTimeRemaining = (endTime: string) => {
+  const formatTimeRemaining = (endTimeUnix: number) => {
     const now = dayjs();
-    const end = dayjs(endTime);
+    const end = dayjs.unix(endTimeUnix);
     const diff = end.diff(now);
 
     if (diff > 0) {
@@ -147,10 +147,9 @@ export default function Component({
       return `Ends in ${timeString}`;
     } else {
       // Market has already ended
-      return `Ended ${dayjs(endTime).fromNow()}`;
+      return `Ended ${end.fromNow()}`;
     }
   };
-
   return (
     <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-xl rounded-2xl border-2 border-purple-600">
       <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
@@ -158,7 +157,8 @@ export default function Component({
           <span className="text-2xl">🎭</span> {market.question}
         </CardTitle>
         <CardDescription className="text-yellow-100 flex items-center gap-2 text-sm">
-          <Clock className="w-4 h-4" /> {formatTimeRemaining(market.endTime)}
+          <Clock className="w-4 h-4" />{" "}
+          {formatTimeRemaining(parseInt(market.endTime.toString()))}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4">

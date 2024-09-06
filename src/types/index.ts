@@ -2,7 +2,7 @@ export interface Market {
   id: number;
   creator: string;
   question: string;
-  endTime: string;
+  endTime: number;
   resolved: boolean;
   yesShares: string;
   noShares: string;

@@ -1,15 +1,6 @@
 import MarketItem from "./MarketItem";
 import { ethers } from "ethers";
-
-interface Market {
-  id: number;
-  creator: string;
-  question: string;
-  endTime: string;
-  resolved: boolean;
-  yesShares: string;
-  noShares: string;
-}
+import { Market } from "@/types";
 
 interface MarketsListProps {
   markets: Market[];

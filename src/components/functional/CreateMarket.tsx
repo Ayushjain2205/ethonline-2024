@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Clock, PlusCircle } from "lucide-react";
+import dayjs from "../../dayjs-config";
 
 interface CreateMarketProps {
   contract: ethers.Contract | null;
@@ -33,8 +34,13 @@ export default function CreateMarket({
     setError("");
     setSuccess("");
     try {
-      const endTimeSeconds = Math.floor(new Date(endTime).getTime() / 1000);
-      const tx = await contract.createMarket(question, endTimeSeconds);
+      const endTimeDate = new Date(endTime);
+      const endTimeUnix = Math.floor(endTimeDate.getTime() / 1000);
+
+      console.log("Selected end time:", endTime);
+      console.log("End time as Unix timestamp:", endTimeUnix);
+
+      const tx = await contract.createMarket(question, endTimeUnix);
       await tx.wait();
       setSuccess("Market created successfully!");
       setQuestion("");
