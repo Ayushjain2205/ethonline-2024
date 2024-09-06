@@ -1,10 +1,18 @@
 import React, { useState, useMemo } from "react";
 import { ethers } from "ethers";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { PREDICTION_MARKET_ADDRESS } from "@/helpers/contractHelpers";
 import { Market } from "@/types";
+import { Clock, DollarSign } from "lucide-react";
 
 interface MarketItemProps {
   market: Market;
@@ -16,7 +24,7 @@ interface MarketItemProps {
   fetchMarkets: () => void;
 }
 
-const MarketItem: React.FC<MarketItemProps> = ({
+export default function Component({
   market,
   contract,
   tokenContract,
@@ -24,7 +32,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
   setError,
   setSuccess,
   fetchMarkets,
-}) => {
+}: MarketItemProps) {
   const [amount, setAmount] = useState("10");
   const [isYes, setIsYes] = useState(true);
 
@@ -37,7 +45,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
     const totalShares = yesShares + noShares;
 
     const calculateForOutcome = (outcomeShares: number) => {
-      if (totalShares === 0) return betAmount * 2; // 1:1 odds if no shares
+      if (totalShares === 0) return betAmount * 2;
       const totalAfterBet = totalShares + betAmount;
       return (totalAfterBet * betAmount) / (outcomeShares + betAmount);
     };
@@ -56,7 +64,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
     setError("");
     setSuccess("");
     try {
-      const amountWei = ethers.parseUnits(amount, 6); // Assuming 6 decimals for USDC
+      const amountWei = ethers.parseUnits(amount, 6);
 
       const balance = await tokenContract.balanceOf(walletAddress);
       if (balance < amountWei) {
@@ -91,65 +99,109 @@ const MarketItem: React.FC<MarketItemProps> = ({
     }
   };
 
-  return (
-    <Card className="mb-4">
-      <CardHeader>
-        <CardTitle>{market.question}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>Creator: {market.creator}</p>
-        <p>End Time: {market.endTime}</p>
-        <p>Resolved: {market.resolved ? "Yes" : "No"}</p>
-        <p>Yes Shares: {market.yesShares}</p>
-        <p>No Shares: {market.noShares}</p>
+  const getEmoji = (amount: number) => {
+    if (amount < 10) return "😐";
+    if (amount < 50) return "🙂";
+    if (amount < 100) return "😄";
+    if (amount < 500) return "🤩";
+    return "🚀";
+  };
 
-        <div className="mt-4">
-          <Input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="mb-2"
-          />
-          <div className="flex space-x-2 mb-2">
-            <Button
-              onClick={() =>
-                setAmount((prev) => (parseFloat(prev) + 1).toString())
-              }
+  return (
+    <Card className="w-full max-w-2xl mx-auto overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+        <CardTitle className="text-2xl font-bold">{market.question}</CardTitle>
+        <CardDescription className="text-white/80 flex items-center gap-2">
+          <Clock className="w-4 h-4" /> Ends:{" "}
+          {new Date(market.endTime).toLocaleString()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="flex justify-between mb-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-500">
+              {market.yesShares}
+            </div>
+            <div className="text-sm text-gray-600">Yes Shares</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-red-500">
+              {market.noShares}
+            </div>
+            <div className="text-sm text-gray-600">No Shares</div>
+          </div>
+          <div className="text-center">
+            <div
+              className={`text-lg font-semibold ${
+                market.resolved ? "text-green-500" : "text-blue-500"
+              }`}
             >
-              +1
+              {market.resolved ? "Completed" : "In Progress"}
+            </div>
+            <div className="text-sm text-gray-600">Status</div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="amount"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Bet Amount (USDC)
+            </label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="amount"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="flex-grow"
+              />
+              <div className="text-4xl">{getEmoji(parseFloat(amount))}</div>
+            </div>
+          </div>
+          <Slider
+            value={[parseFloat(amount)]}
+            onValueChange={(value) => setAmount(value[0].toString())}
+            max={1000}
+            step={1}
+            className="my-4"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              onClick={() => {
+                setIsYes(true);
+                buyShares();
+              }}
+              className={`w-full ${
+                isYes
+                  ? "bg-green-500 hover:bg-green-600"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
+            >
+              Yes
+              <DollarSign className="w-4 h-4 ml-2" />
+              {calculatePayout.yes}
             </Button>
             <Button
-              onClick={() =>
-                setAmount((prev) => (parseFloat(prev) + 10).toString())
-              }
+              onClick={() => {
+                setIsYes(false);
+                buyShares();
+              }}
+              className={`w-full ${
+                !isYes
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+              }`}
             >
-              +10
+              No
+              <DollarSign className="w-4 h-4 ml-2" />
+              {calculatePayout.no}
             </Button>
           </div>
-          <Button
-            onClick={() => {
-              setIsYes(true);
-              buyShares();
-            }}
-            className="w-full mb-2"
-            variant={isYes ? "default" : "outline"}
-          >
-            Bet Yes (Potential payout: ${calculatePayout.yes})
-          </Button>
-          <Button
-            onClick={() => {
-              setIsYes(false);
-              buyShares();
-            }}
-            className="w-full"
-            variant={!isYes ? "default" : "outline"}
-          >
-            Bet No (Potential payout: ${calculatePayout.no})
-          </Button>
         </div>
       </CardContent>
     </Card>
   );
-};
-
-export default MarketItem;
+}
