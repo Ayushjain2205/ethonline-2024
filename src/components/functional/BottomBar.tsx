@@ -8,7 +8,7 @@ const BottomBar = () => {
   const menuItems = [
     { name: "Markets", path: "/markets", icon: BarChart2 },
     { name: "Live", path: "/live", icon: Tv },
-    { name: "Activity", path: "/activity", icon: ActivitySquare },
+    { name: "Create", path: "/create-market", icon: ActivitySquare },
   ];
 
   return (
