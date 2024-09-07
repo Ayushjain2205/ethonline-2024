@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PREDICTION_MARKET_ADDRESS } from "@/helpers/contractHelpers";
 import { Market } from "@/types";
 import { Clock, ThumbsUp, ThumbsDown } from "lucide-react";
+import toast from "react-hot-toast";
 import dayjs from "../../dayjs-config";
 
 interface MarketItemProps {
@@ -18,8 +19,6 @@ interface MarketItemProps {
   contract: ethers.Contract | null;
   tokenContract: ethers.Contract | null;
   walletAddress: string;
-  setError: (error: string) => void;
-  setSuccess: (success: string) => void;
   fetchMarkets: () => void;
 }
 
@@ -28,8 +27,6 @@ export default function Component({
   contract,
   tokenContract,
   walletAddress,
-  setError,
-  setSuccess,
   fetchMarkets,
 }: MarketItemProps) {
   const [amount, setAmount] = useState(5);
@@ -60,8 +57,6 @@ export default function Component({
 
   const buyShares = async (selectedIsYes: boolean) => {
     if (!contract || !tokenContract) return;
-    setError("");
-    setSuccess("");
     try {
       console.log("Buying shares for market:", market.id);
       console.log("Is Yes:", selectedIsYes);
@@ -74,12 +69,7 @@ export default function Component({
       console.log("Wallet balance:", ethers.formatUnits(balance, 6));
 
       if (balance < amountWei) {
-        setError(
-          `Oops! Not enough coins in your piggy bank! You need ${ethers.formatUnits(
-            amountWei,
-            6
-          )} USDC.`
-        );
+        toast.error("Insufficient USDC balance");
         return;
       }
 
@@ -112,18 +102,11 @@ export default function Component({
       await buyTx.wait();
       console.log("Buy transaction completed");
 
-      setSuccess("Woohoo! You've placed your bet successfully!");
+      toast.success("Shares bought successfully!");
       fetchMarkets();
     } catch (error) {
       console.error("Error buying shares:", error);
-      if (error instanceof Error) {
-        console.error("Error name:", error.name);
-        console.error("Error message:", error.message);
-        if ("reason" in error) {
-          console.error("Error reason:", (error as any).reason);
-        }
-      }
-      setError("Uh-oh! Something went wrong: " + (error as Error).message);
+      toast.error("Something went wrong");
     }
   };
 

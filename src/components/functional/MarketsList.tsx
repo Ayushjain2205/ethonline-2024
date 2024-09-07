@@ -7,8 +7,6 @@ interface MarketsListProps {
   contract: ethers.Contract | null;
   tokenContract: ethers.Contract | null;
   walletAddress: string;
-  setError: (error: string) => void;
-  setSuccess: (success: string) => void;
   fetchMarkets: () => void;
 }
 
@@ -17,8 +15,6 @@ const MarketsList: React.FC<MarketsListProps> = ({
   contract,
   tokenContract,
   walletAddress,
-  setError,
-  setSuccess,
   fetchMarkets,
 }) => {
   return (
@@ -32,8 +28,6 @@ const MarketsList: React.FC<MarketsListProps> = ({
             contract={contract}
             tokenContract={tokenContract}
             walletAddress={walletAddress}
-            setError={setError}
-            setSuccess={setSuccess}
             fetchMarkets={fetchMarkets}
           />
         ))}

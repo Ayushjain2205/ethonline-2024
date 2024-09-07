@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import toast from "react-hot-toast";
 import { Market } from "@/types";
 
 import {
@@ -28,8 +28,6 @@ export default function PredictionMarketPage() {
     null
   );
   const [walletAddress, setWalletAddress] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
   const [markets, setMarkets] = useState<Market[]>([]);
 
@@ -45,7 +43,6 @@ export default function PredictionMarketPage() {
 
   const connectWallet = async () => {
     setIsConnecting(true);
-    setError("");
     try {
       if (typeof window.ethereum !== "undefined") {
         await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -67,12 +64,13 @@ export default function PredictionMarketPage() {
         setContract(predictionMarketContract);
         setTokenContract(usdcTokenContract);
         setWalletAddress(await signer.getAddress());
+        toast.success("Wallet connected successfully!");
       } else {
-        setError("Ethereum wallet not detected. Please install MetaMask.");
+        toast.error("Ethereum wallet not detected. Please install MetaMask.");
       }
     } catch (error) {
       console.error("Failed to connect:", error);
-      setError("Failed to connect to wallet: " + (error as Error).message);
+      toast.error("Something went wrong");
     } finally {
       setIsConnecting(false);
     }
@@ -95,32 +93,19 @@ export default function PredictionMarketPage() {
           noShares: ethers.formatUnits(market.noShares, 6),
         });
       }
-      // Sort markets in descending order of time
       const sortedMarkets = fetchedMarkets.sort(
         (a, b) => b.endTime - a.endTime
       );
       setMarkets(sortedMarkets);
     } catch (error) {
       console.error("Error fetching markets:", error);
-      setError("Failed to fetch markets: " + (error as Error).message);
+      toast.error("Something went wrong");
     }
   };
 
   return (
     <div className="w-full max-w-sm text-wrap container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6 text-center">Prediction Market</h1>
-
-      {/* {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )} */}
-
-      {success && (
-        <Alert variant="success" className="mb-4">
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
 
       {!walletAddress ? (
         <Button
@@ -136,20 +121,13 @@ export default function PredictionMarketPage() {
             Connected wallet: {walletAddress}
           </p>
 
-          <CreateMarket
-            contract={contract}
-            setError={setError}
-            setSuccess={setSuccess}
-            fetchMarkets={fetchMarkets}
-          />
+          <CreateMarket contract={contract} fetchMarkets={fetchMarkets} />
 
           <MarketsList
             markets={markets}
             contract={contract}
             tokenContract={tokenContract}
             walletAddress={walletAddress}
-            setError={setError}
-            setSuccess={setSuccess}
             fetchMarkets={fetchMarkets}
           />
         </>

@@ -11,19 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Clock, PlusCircle } from "lucide-react";
-import dayjs from "../../dayjs-config";
+import toast from "react-hot-toast";
 
 interface CreateMarketProps {
   contract: ethers.Contract | null;
-  setError: (error: string) => void;
-  setSuccess: (success: string) => void;
   fetchMarkets: () => void;
 }
 
 export default function CreateMarket({
   contract,
-  setError,
-  setSuccess,
   fetchMarkets,
 }: CreateMarketProps) {
   const [question, setQuestion] = useState("");
@@ -31,8 +27,6 @@ export default function CreateMarket({
 
   const createMarket = async () => {
     if (!contract) return;
-    setError("");
-    setSuccess("");
     try {
       const endTimeDate = new Date(endTime);
       const endTimeUnix = Math.floor(endTimeDate.getTime() / 1000);
@@ -42,13 +36,13 @@ export default function CreateMarket({
 
       const tx = await contract.createMarket(question, endTimeUnix);
       await tx.wait();
-      setSuccess("Market created successfully!");
+      toast.success("Market created successfully!");
       setQuestion("");
       setEndTime("");
       fetchMarkets();
     } catch (error) {
       console.error("Error creating market:", error);
-      setError("Error creating market: " + (error as Error).message);
+      toast.error("Something went wrong");
     }
   };
 

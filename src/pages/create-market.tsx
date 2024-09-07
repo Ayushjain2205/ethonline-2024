@@ -61,8 +61,6 @@ export default function CreateMarketPage() {
 
       <CreateMarket
         contract={null}
-        setError={setError}
-        setSuccess={handleSuccess}
         fetchMarkets={() => {}}
         // getContract={handleCreateMarket}
       />
