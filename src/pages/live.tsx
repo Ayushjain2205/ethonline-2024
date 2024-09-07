@@ -175,7 +175,7 @@ export default function LivePage() {
                       className="w-full h-1 bg-purple-200 rounded-full appearance-none cursor-pointer"
                     />
                     <div
-                      className="absolute left-0 top-3 flex items-center justify-center w-6 h-6 transform -translate-x-1/2 bg-yellow-400 rounded-full text-purple-900 font-bold text-xs border-2 border-purple-600 shadow-md transition-all duration-200 ease-out"
+                      className="absolute left-0 top-1 flex items-center justify-center w-6 h-6 transform -translate-x-1/2 bg-yellow-400 rounded-full text-purple-900 font-bold text-xs border-2 border-purple-600 shadow-md transition-all duration-200 ease-out"
                       style={{ left: `${((amount - 1) / 9) * 100}%` }}
                     >
                       ${amount}
@@ -191,14 +191,14 @@ export default function LivePage() {
                     onClick={() => console.log("Yes bet placed")}
                     className="py-2 px-3 text-sm font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md"
                   >
-                    <Zap className="w-3 h-3 mr-1" />
+                    <ThumbsUp className="w-3 h-3 mr-1" />
                     {market.yesOption} (${market.yesOdds.toFixed(2)})
                   </Button>
                   <Button
                     onClick={() => console.log("No bet placed")}
                     className="py-2 px-3 text-sm font-bold rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors duration-200 shadow-md"
                   >
-                    <Zap className="w-3 h-3 mr-1" />
+                    <ThumbsDown className="w-3 h-3 mr-1" />
                     {market.noOption} (${market.noOdds.toFixed(2)})
                   </Button>
                 </div>
