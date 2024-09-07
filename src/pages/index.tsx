@@ -27,9 +27,7 @@ export default function LaunchScreen() {
       </div>
 
       <img src="/logo.svg" alt="Betomo" className="w-48 h-48 animate-bounce" />
-      <p className="text-white text-center mb-8 max-w-xs">
-        Make micro-bets on sports outcomes with the power of AI
-      </p>
+
       {showLogin && (
         <button
           onClick={handleLogin}
