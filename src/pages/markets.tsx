@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { Market } from "@/types";
 import TopBar from "@/components/functional/TopBar";
+import Layout from "@/components/Layout";
 
 import {
   PREDICTION_MARKET_ADDRESS,
@@ -119,37 +120,30 @@ export default function PredictionMarketPage() {
   }, [tokenContract, walletAddress]);
 
   return (
-    <>
-      <TopBar usdcBalance={balance} />
-      <div className="w-full max-w-sm text-wrap container mx-auto px-4 py-6 mt-16">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Prediction Market
-        </h1>
-
-        {!walletAddress ? (
-          <Button
-            onClick={connectWallet}
-            disabled={isConnecting}
-            className="w-full"
-          >
-            {isConnecting ? "Connecting..." : "Connect Wallet"}
-          </Button>
-        ) : (
-          <>
-            <p className="mb-4 text-sm text-center break-words">
-              Connected wallet: {walletAddress}
-            </p>
-
-            <MarketsList
-              markets={markets}
-              contract={contract}
-              tokenContract={tokenContract}
-              walletAddress={walletAddress}
-              fetchMarkets={fetchMarkets}
-            />
-          </>
-        )}
-      </div>
-    </>
+    <Layout usdcBalance={balance}>
+      <h1 className="text-2xl font-bold mb-6 text-center">Prediction Market</h1>
+      {!walletAddress ? (
+        <Button
+          onClick={connectWallet}
+          disabled={isConnecting}
+          className="w-full"
+        >
+          {isConnecting ? "Connecting..." : "Connect Wallet"}
+        </Button>
+      ) : (
+        <>
+          <p className="mb-4 text-sm text-center break-words">
+            Connected wallet: {walletAddress}
+          </p>
+          <MarketsList
+            markets={markets}
+            contract={contract}
+            tokenContract={tokenContract}
+            walletAddress={walletAddress}
+            fetchMarkets={fetchMarkets}
+          />
+        </>
+      )}
+    </Layout>
   );
 }

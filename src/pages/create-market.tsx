@@ -1,3 +1,4 @@
+import Layout from "@/components/Layout";
 import TopBar from "@/components/functional/TopBar";
 import { MOCK_TOKEN_ADDRESS, MOCK_TOKEN_ABI } from "@/helpers/contractHelpers";
 import { useState, useEffect } from "react";
@@ -69,15 +70,9 @@ export default function CreateMarketPage() {
   };
 
   return (
-    <>
-      <TopBar usdcBalance={usdcBalance} />
-      <div className="container mx-auto px-4 py-6 max-w-md mt-16">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Create New Market
-        </h1>
-
-        <CreateMarket contract={contract} fetchMarkets={handleSuccess} />
-      </div>
-    </>
+    <Layout usdcBalance={usdcBalance}>
+      <h1 className="text-2xl font-bold mb-6 text-center">Create New Market</h1>
+      <CreateMarket contract={contract} fetchMarkets={handleSuccess} />
+    </Layout>
   );
 }

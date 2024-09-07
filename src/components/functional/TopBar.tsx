@@ -17,7 +17,7 @@ const TopBar = ({ usdcBalance }: TopBarProps) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-purple-600 text-yellow-300 p-4 flex justify-between items-center z-50">
+    <div className="fixed top-0 left-0 right-0 bg-purple-600 text-yellow-300 px-4 py-2 flex justify-between items-center z-50">
       <div
         className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
         onClick={handleLogoClick}
