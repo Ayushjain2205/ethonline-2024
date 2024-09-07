@@ -121,8 +121,6 @@ export default function PredictionMarketPage() {
             Connected wallet: {walletAddress}
           </p>
 
-          <CreateMarket contract={contract} fetchMarkets={fetchMarkets} />
-
           <MarketsList
             markets={markets}
             contract={contract}
