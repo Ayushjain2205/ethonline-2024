@@ -1,5 +1,5 @@
-import PredictionMarketABI from "../../web3/artifacts/contracts/PredictionMarket.sol/PredictionMarket.json";
-import MockTokenABI from "../../web3/artifacts/contracts/MockToken.sol/MockToken.json";
+import PredictionMarketABI from "./PredictionMarket.json";
+import MockTokenABI from "./MockToken.json";
 
 export const PREDICTION_MARKET_ADDRESS =
   "0xbc71aDFcD89E9Feffb867839f94B59D19921260C";
