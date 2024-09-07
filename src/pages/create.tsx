@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import CreateMarket from "@/components/functional/CreateMarket";
+import { ethers } from "ethers";
 
 const sports = [
   { name: "Football", emoji: "⚽" },
@@ -38,7 +40,15 @@ const mockEvents = {
   ],
 };
 
-export default function CreateMarketPage() {
+interface CreateMarketPageProps {
+  contract: ethers.Contract | null;
+  fetchMarkets: () => void;
+}
+
+export default function CreateMarketPage({
+  contract,
+  fetchMarkets,
+}: CreateMarketPageProps) {
   const [step, setStep] = useState(1);
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedEvent, setSelectedEvent] = useState("");
@@ -65,10 +75,7 @@ export default function CreateMarketPage() {
     setIsGenerating(true);
     // Simulating AI generation with a timeout
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    setGeneratedMarket(`Will ${selectedEvent} have more than 3 goals? 
-    Options: Yes / No
-    End time: 24 hours from now
-    Initial liquidity: $1000`);
+    setGeneratedMarket(`Will ${selectedEvent} have more than 3 goals?`);
     setIsGenerating(false);
     setStep(4);
   };
@@ -180,25 +187,17 @@ export default function CreateMarketPage() {
 
         {step === 4 && (
           <div>
-            <h2 className="text-xl font-semibold mb-4 text-purple-600">
-              Generated Market
-            </h2>
-            <Card className="mb-4">
-              <CardContent className="p-4">
-                <pre className="whitespace-pre-wrap">{generatedMarket}</pre>
-              </CardContent>
-            </Card>
-            <div className="flex gap-2">
-              <Button
-                onClick={prevStep}
-                className="flex-1 h-12 text-sm font-bold rounded-full bg-yellow-400 hover:bg-yellow-500 text-purple-900 transition-colors duration-200 shadow-md"
-              >
-                Edit
-              </Button>
-              <Button className="flex-1 h-12 text-sm font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md">
-                Create Market
-              </Button>
-            </div>
+            <CreateMarket
+              contract={contract}
+              fetchMarkets={fetchMarkets}
+              initialQuestion={generatedMarket}
+            />
+            <Button
+              onClick={prevStep}
+              className="w-full h-12 mt-4 text-sm font-bold rounded-full bg-yellow-400 hover:bg-yellow-500 text-purple-900 transition-colors duration-200 shadow-md"
+            >
+              Edit Market Details
+            </Button>
           </div>
         )}
       </div>
