@@ -23,6 +23,15 @@ const config: Config = {
       fontFamily: {
         sans: ["Acme", "sans-serif"],
       },
+      keyframes: {
+        flip: {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "25%, 75%": { transform: "rotate(180deg)" },
+        },
+      },
+      animation: {
+        flip: "flip 4s infinite ease-in-out",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
