@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { Market } from "@/types";
+import TopBar from "@/components/functional/TopBar";
 
 import {
   PREDICTION_MARKET_ADDRESS,
@@ -30,6 +31,7 @@ export default function PredictionMarketPage() {
   const [walletAddress, setWalletAddress] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
   const [markets, setMarkets] = useState<Market[]>([]);
+  const [balance, setBalance] = useState<string | null>(null);
 
   useEffect(() => {
     connectWallet();
@@ -103,33 +105,51 @@ export default function PredictionMarketPage() {
     }
   };
 
+  const fetchBalance = async () => {
+    if (tokenContract && walletAddress) {
+      const balance = await tokenContract.balanceOf(walletAddress);
+      setBalance(ethers.formatUnits(balance, 6));
+    }
+  };
+
+  useEffect(() => {
+    if (tokenContract && walletAddress) {
+      fetchBalance();
+    }
+  }, [tokenContract, walletAddress]);
+
   return (
-    <div className="w-full max-w-sm text-wrap container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">Prediction Market</h1>
+    <>
+      <TopBar usdcBalance={balance} />
+      <div className="w-full max-w-sm text-wrap container mx-auto px-4 py-6 mt-16">
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Prediction Market
+        </h1>
 
-      {!walletAddress ? (
-        <Button
-          onClick={connectWallet}
-          disabled={isConnecting}
-          className="w-full"
-        >
-          {isConnecting ? "Connecting..." : "Connect Wallet"}
-        </Button>
-      ) : (
-        <>
-          <p className="mb-4 text-sm text-center break-words">
-            Connected wallet: {walletAddress}
-          </p>
+        {!walletAddress ? (
+          <Button
+            onClick={connectWallet}
+            disabled={isConnecting}
+            className="w-full"
+          >
+            {isConnecting ? "Connecting..." : "Connect Wallet"}
+          </Button>
+        ) : (
+          <>
+            <p className="mb-4 text-sm text-center break-words">
+              Connected wallet: {walletAddress}
+            </p>
 
-          <MarketsList
-            markets={markets}
-            contract={contract}
-            tokenContract={tokenContract}
-            walletAddress={walletAddress}
-            fetchMarkets={fetchMarkets}
-          />
-        </>
-      )}
-    </div>
+            <MarketsList
+              markets={markets}
+              contract={contract}
+              tokenContract={tokenContract}
+              walletAddress={walletAddress}
+              fetchMarkets={fetchMarkets}
+            />
+          </>
+        )}
+      </div>
+    </>
   );
 }

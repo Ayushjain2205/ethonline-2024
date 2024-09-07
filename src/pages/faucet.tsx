@@ -12,6 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Wallet, Coins } from "lucide-react";
 import toast from "react-hot-toast";
+import TopBar from "@/components/functional/TopBar";
 
 import { MOCK_TOKEN_ADDRESS, MOCK_TOKEN_ABI } from "@/helpers/contractHelpers";
 
@@ -93,74 +94,79 @@ export default function USDCFaucet() {
   };
 
   return (
-    <div className="w-full max-w-sm container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">USDC Faucet</h1>
+    <>
+      <TopBar usdcBalance={walletAddress ? balance : null} />
+      <div className="w-full max-w-sm container mx-auto px-4 py-6 mt-16">
+        <h1 className="text-2xl font-bold mb-6 text-center">USDC Faucet</h1>
 
-      <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-lg rounded-2xl border-2 border-purple-600">
-        <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
-          <CardTitle className="text-xl font-extrabold flex items-center gap-2">
-            <span className="text-2xl">💰</span> USDC Faucet
-          </CardTitle>
-          <CardDescription className="text-yellow-100 text-sm">
-            Get some mock USDC to play with!
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-4 space-y-4">
-          {!walletAddress ? (
-            <Button
-              onClick={connectWallet}
-              disabled={isConnecting}
-              className="w-full h-12 text-base font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md flex items-center justify-center"
-            >
-              <Wallet className="w-5 h-5 mr-2" />
-              {isConnecting ? "Connecting..." : "Connect Wallet"}
-            </Button>
-          ) : (
-            <>
-              <div className="bg-white rounded-xl p-3 shadow-inner">
-                <p className="text-sm font-bold text-purple-700 mb-1">
-                  Connected wallet:
-                </p>
-                <p className="text-sm">{truncateAddress(walletAddress)}</p>
-              </div>
-              <div className="bg-white rounded-xl p-3 shadow-inner">
-                <p className="text-sm font-bold text-purple-700 mb-1">
-                  Current USDC balance:
-                </p>
-                <p className="text-lg font-bold">{balance} USDC</p>
-              </div>
-              <div className="bg-white rounded-xl p-3 shadow-inner">
-                <Label
-                  htmlFor="amount"
-                  className="block text-lg font-bold text-purple-700 mb-2"
-                >
-                  Amount of USDC to mint (max 1000):
-                </Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount (max 1000)"
-                  min="0"
-                  max="1000"
-                  className="w-full p-2 border-2 border-purple-400 rounded-xl text-base"
-                />
-              </div>
+        <Card className="w-full max-w-sm mx-auto overflow-hidden bg-gradient-to-br from-yellow-300 to-orange-400 text-purple-900 shadow-lg rounded-2xl border-2 border-purple-600">
+          <CardHeader className="bg-purple-600 text-yellow-300 p-4 rounded-t-xl">
+            <CardTitle className="text-xl font-extrabold flex items-center gap-2">
+              <span className="text-2xl">💰</span> USDC Faucet
+            </CardTitle>
+            <CardDescription className="text-yellow-100 text-sm">
+              Get some mock USDC to play with!
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-4 space-y-4">
+            {!walletAddress ? (
               <Button
-                onClick={mintUSDC}
-                disabled={
-                  !tokenContract || Number(amount) <= 0 || Number(amount) > 1000
-                }
+                onClick={connectWallet}
+                disabled={isConnecting}
                 className="w-full h-12 text-base font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md flex items-center justify-center"
               >
-                <Coins className="w-5 h-5 mr-2" />
-                Mint USDC
+                <Wallet className="w-5 h-5 mr-2" />
+                {isConnecting ? "Connecting..." : "Connect Wallet"}
               </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            ) : (
+              <>
+                <div className="bg-white rounded-xl p-3 shadow-inner">
+                  <p className="text-sm font-bold text-purple-700 mb-1">
+                    Connected wallet:
+                  </p>
+                  <p className="text-sm">{truncateAddress(walletAddress)}</p>
+                </div>
+                <div className="bg-white rounded-xl p-3 shadow-inner">
+                  <p className="text-sm font-bold text-purple-700 mb-1">
+                    Current USDC balance:
+                  </p>
+                  <p className="text-lg font-bold">{balance} USDC</p>
+                </div>
+                <div className="bg-white rounded-xl p-3 shadow-inner">
+                  <Label
+                    htmlFor="amount"
+                    className="block text-lg font-bold text-purple-700 mb-2"
+                  >
+                    Amount of USDC to mint (max 1000):
+                  </Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount (max 1000)"
+                    min="0"
+                    max="1000"
+                    className="w-full p-2 border-2 border-purple-400 rounded-xl text-base"
+                  />
+                </div>
+                <Button
+                  onClick={mintUSDC}
+                  disabled={
+                    !tokenContract ||
+                    Number(amount) <= 0 ||
+                    Number(amount) > 1000
+                  }
+                  className="w-full h-12 text-base font-bold rounded-full bg-green-500 hover:bg-green-600 text-white transition-colors duration-200 shadow-md flex items-center justify-center"
+                >
+                  <Coins className="w-5 h-5 mr-2" />
+                  Mint USDC
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 }
