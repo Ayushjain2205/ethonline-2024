@@ -33,7 +33,7 @@ export default function CreateMarket({
   }, [initialQuestion]);
 
   const createMarket = async () => {
-    if (!contract) return;
+    // if (!contract) return;
     try {
       const endTimeDate = new Date(endTime);
       const endTimeUnix = Math.floor(endTimeDate.getTime() / 1000);
@@ -41,14 +41,14 @@ export default function CreateMarket({
       console.log("Selected end time:", endTime);
       console.log("End time as Unix timestamp:", endTimeUnix);
 
-      const tx = await contract.createMarket(question, endTimeUnix);
-      await tx.wait();
+      // const tx = await contract.createMarket(question, endTimeUnix);
+      // await tx.wait();
       setTimeout(() => {
         toast.success("Market created successfully!");
       }, 3000);
-      setQuestion("");
-      setEndTime("");
-      fetchMarkets();
+      // setQuestion("");
+      // setEndTime("");
+      // fetchMarkets();
     } catch (error) {
       console.error("Error creating market:", error);
       toast.error("Something went wrong");

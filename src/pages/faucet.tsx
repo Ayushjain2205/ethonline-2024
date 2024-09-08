@@ -47,7 +47,7 @@ export default function USDCFaucet() {
         const address = await signer.getAddress();
         setWalletAddress(address);
         updateBalance(tokenContract, address);
-        toast.success("Wallet connected successfully!");
+        //toast.success("Wallet connected successfully!");
       } else {
         toast.error("Ethereum wallet not detected. Please install MetaMask.");
       }
