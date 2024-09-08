@@ -121,29 +121,13 @@ export default function PredictionMarketPage() {
 
   return (
     <Layout usdcBalance={balance}>
-      <h1 className="text-2xl font-bold mb-6 text-center">Prediction Market</h1>
-      {!walletAddress ? (
-        <Button
-          onClick={connectWallet}
-          disabled={isConnecting}
-          className="w-full"
-        >
-          {isConnecting ? "Connecting..." : "Connect Wallet"}
-        </Button>
-      ) : (
-        <>
-          <p className="mb-4 text-sm text-center break-words">
-            Connected wallet: {walletAddress}
-          </p>
-          <MarketsList
-            markets={markets}
-            contract={contract}
-            tokenContract={tokenContract}
-            walletAddress={walletAddress}
-            fetchMarkets={fetchMarkets}
-          />
-        </>
-      )}
+      <MarketsList
+        markets={markets}
+        contract={contract}
+        tokenContract={tokenContract}
+        walletAddress={walletAddress}
+        fetchMarkets={fetchMarkets}
+      />
     </Layout>
   );
 }

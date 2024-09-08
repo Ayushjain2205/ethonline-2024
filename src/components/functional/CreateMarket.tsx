@@ -43,7 +43,9 @@ export default function CreateMarket({
 
       const tx = await contract.createMarket(question, endTimeUnix);
       await tx.wait();
-      toast.success("Market created successfully!");
+      setTimeout(() => {
+        toast.success("Market created successfully!");
+      }, 3000);
       setQuestion("");
       setEndTime("");
       fetchMarkets();

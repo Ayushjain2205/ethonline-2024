@@ -28,9 +28,9 @@ const mockEvents = {
     "Bayern Munich vs Borussia Dortmund",
   ],
   Tennis: [
-    "Wimbledon Final",
-    "French Open Semi-Final",
-    "US Open Quarter-Final",
+    "US Open Men's Final",
+    "US Open Women's Final",
+    "US Open Mixed Doubles Final",
   ],
   F1: ["Monaco Grand Prix", "Italian Grand Prix", "British Grand Prix"],
   Other: [
@@ -75,7 +75,7 @@ export default function CreateMarketPage({
     setIsGenerating(true);
     // Simulating AI generation with a timeout
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    setGeneratedMarket(`Will ${selectedEvent} have more than 3 goals?`);
+    setGeneratedMarket(`Will Sinner have more aces?`);
     setIsGenerating(false);
     setStep(4);
   };
