@@ -14,6 +14,7 @@ import {
 export default function CreateMarketPage() {
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [usdcBalance, setUsdcBalance] = useState<string | null>(null);
+  const [initialQuestion, setInitialQuestion] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -72,7 +73,11 @@ export default function CreateMarketPage() {
   return (
     <Layout usdcBalance={usdcBalance}>
       <h1 className="text-2xl font-bold mb-6 text-center">Create New Market</h1>
-      <CreateMarket contract={contract} fetchMarkets={handleSuccess} />
+      <CreateMarket
+        contract={contract}
+        fetchMarkets={handleSuccess}
+        initialQuestion={initialQuestion}
+      />
     </Layout>
   );
 }
